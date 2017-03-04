@@ -8,5 +8,6 @@ type System interface {
 }
 
 type ScalableSystem struct {
-	System System
+	System  System
+	MaxLoad int
 }
