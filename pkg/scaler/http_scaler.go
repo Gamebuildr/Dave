@@ -11,7 +11,6 @@ type HTTPScaler struct {
 	LoadAPIUrl    string
 	AddLoadAPIUrl string
 	Client        *http.Client
-	MaxLoad       int
 }
 
 // Response is the data that is returned from the API

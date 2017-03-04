@@ -41,7 +41,7 @@ func TestGetQueueMessages(t *testing.T) {
 	}
 	for i, c := range mockMessages {
 		queue := AmazonWatcher{Client: MockedAmazonClient{Response: c.Resp}}
-		count, err := queue.ReadQueueMessages(fmt.Sprintf("mockUrl_%d", i))
+		count, err := queue.ReadQueueMessagesCount(fmt.Sprintf("mockUrl_%d", i))
 		if err != nil {
 			t.Fatalf("%d, amazon test error, %v", i, err)
 		}

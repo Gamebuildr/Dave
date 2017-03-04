@@ -11,8 +11,8 @@ type AmazonWatcher struct {
 	Client sqsiface.SQSAPI
 }
 
-// ReadQueueMessages from the specified amazon queue
-func (watcher AmazonWatcher) ReadQueueMessages(url string) (int, error) {
+// ReadQueueMessagesCount from the specified amazon queue
+func (watcher AmazonWatcher) ReadQueueMessagesCount(url string) (int, error) {
 	params := sqs.ReceiveMessageInput{
 		QueueUrl:            aws.String(url),
 		MaxNumberOfMessages: aws.Int64(1),
