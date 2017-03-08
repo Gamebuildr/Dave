@@ -50,16 +50,17 @@ func (client *DaveClient) Create() {
 // RunClient will read queue messages and send a response to an api endpoint to
 // start up systems if the load is less than the max load
 func (client *DaveClient) RunClient(system *scaler.ScalableSystem, queueURL string) {
-	count, err := client.Watcher.Queue.ReadQueueMessagesCount(queueURL)
+	messageCount, err := client.Watcher.Queue.ReadQueueMessagesCount(queueURL)
 	if err != nil {
 		client.Log.Error(err.Error())
 	}
-	if count <= 0 {
+	if messageCount <= 0 {
 		return
 	}
 	load, err := system.System.GetSystemLoad()
 	if err != nil {
 		client.Log.Error(err.Error())
+		return
 	}
 	if load > system.MaxLoad {
 		client.Log.Info("system at max load")
@@ -68,6 +69,7 @@ func (client *DaveClient) RunClient(system *scaler.ScalableSystem, queueURL stri
 	resp, err := system.System.AddSystemLoad()
 	if err != nil {
 		client.Log.Error(err.Error())
+		return
 	}
 	if resp.StatusCode != http.StatusOK {
 		client.Log.Error(resp.Status)

@@ -14,3 +14,6 @@ const HalGogetaAPI string = "HAL_GOGETA_API"
 
 // HalMrRobotAPI is the api endpoint for hal monitoring MrRobot
 const HalMrRobotAPI string = "HAL_MRROBOT_API"
+
+// Auth0ClientSecret is the authentication token to use for microservices
+const Auth0ClientSecret string = "AUTH0_CLIENT_SECRET"
