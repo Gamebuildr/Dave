@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
+
+	"github.com/Gamebuildr/Hal/pkg/config"
 )
 
 func TestHTTPScalerReturnsHTTPLoad(t *testing.T) {
@@ -47,5 +50,34 @@ func TestHTTPScalerHitScalingRequestEndpoint(t *testing.T) {
 	}
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("Expected http status %v, but got %v", http.StatusOK, resp.Status)
+	}
+}
+
+func TestHTTPScalerCanAuthenticateARouteWithCorrectToken(t *testing.T) {
+	mockToken := "mockTest"
+	os.Setenv(config.Auth0ClientSecret, mockToken)
+
+	r, err := http.NewRequest(http.MethodPost, "/mock/url", nil)
+	authenticateRoute(r)
+
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		t.Errorf("Expected url to be authorized")
+	}
+}
+
+func TestHTTPTokenValueReturnsSignedString(t *testing.T) {
+	mockToken := "mockTest"
+	os.Setenv(config.Auth0ClientSecret, mockToken)
+
+	tokenString, err := getStringToken()
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+	if tokenString == mockToken {
+		t.Errorf("Expected %v token to be hashed, got %v", mockToken, tokenString)
 	}
 }
