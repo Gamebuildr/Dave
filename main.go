@@ -23,7 +23,11 @@ func main() {
 	})
 	c.Start()
 
-	http.ListenAndServe(":3001", nil)
+	daveClient.Log.Info("Dave client running on port 3001.")
+	err := http.ListenAndServe(":3001", nil)
+	if err != nil {
+		daveClient.Log.Error(err.Error())
+	}
 }
 
 func createGogetaScaler() *scaler.ScalableSystem {
