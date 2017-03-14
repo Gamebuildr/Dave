@@ -1,0 +1,28 @@
+machine:
+  environment:
+    GOBIN: "/home/ubuntu/bin"
+
+dependencies:
+  pre:
+    - echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
+    - sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update
+    - sudo /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+    - sudo /opt/google-cloud-sdk/bin/gcloud config set project $GCLOUD_PROJECT
+    - go get -t -d -v ./...
+    - go build -v
+    - go install -v
+
+test:
+  override:
+    - go test -v -race ./...
+
+deployment:
+  prod:
+    branch: master
+    commands:
+      - cp /home/ubuntu/bin/Dave .
+      - docker build --rm=false -t gamebuildr/dave .
+      - docker tag gamebuildr/dave gcr.io/gamebuildr-151415/gamebuildr-dave
+      - sudo /opt/google-cloud-sdk/bin/gcloud docker -- push gcr.io/gamebuildr-151415/gamebuildr-dave
+      #- sudo scp -i ~/.ssh/id_circle-ci /home/ubuntu/bin/Dave boomer@35.187.20.26:/var/www/go/bin
+      #- ssh -i ~/.ssh/id_circle-ci boomer@35.187.20.26 sudo service supervisor restart
