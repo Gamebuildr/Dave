@@ -30,6 +30,6 @@ deployment:
       - docker tag gamebuildr/dave gcr.io/gamebuildr-151415/gamebuildr-dave
       - sudo /opt/google-cloud-sdk/bin/gcloud docker -- push gcr.io/gamebuildr-151415/gamebuildr-dave
       - ssh -i ~/.ssh/id_circle-ci boomer@35.187.70.152 gcloud docker -- pull gcr.io/gamebuildr-151415/gamebuildr-dave
-      - ssh -i ~/.ssh/id_circle-ci boomer@35.187.70.152 sudo gcloud docker -- stop $(docker ps -q --filter ancestor=gcr.io/gamebuildr-151415/gamebuildr-dave)
-      - ssh -i ~/.ssh/id_circle-ci boomer@35.187.70.152 sudo gcloud docker -- run -d gcr.io/gamebuildr-151415/gamebuildr-dave
+      - sudo ssh -i ~/.ssh/id_circle-ci boomer@35.187.70.152 gcloud docker -- stop $(docker ps -q --filter ancestor=gcr.io/gamebuildr-151415/gamebuildr-dave)
+      - sudo ssh -i ~/.ssh/id_circle-ci boomer@35.187.70.152 gcloud docker -- run -d gcr.io/gamebuildr-151415/gamebuildr-dave
       
