@@ -1,7 +1,9 @@
-machine:
+general:
   branches:
     only:
     - master
+
+machine:
   python:
     version: 2.7.3
   services:
