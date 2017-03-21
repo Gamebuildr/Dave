@@ -6,5 +6,4 @@ RUN mkdir -p /var/www/go/bin; \
 COPY Dave /var/www/go/bin
 
 # Run Dave
-CMD cd /var/www/go/bin; \
-    Dave
+CMD /var/www/go/bin/Dave
