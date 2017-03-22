@@ -17,3 +17,6 @@ const HalMrRobotAPI string = "HAL_MRROBOT_API"
 
 // Auth0ClientSecret is the authentication token to use for microservices
 const Auth0ClientSecret string = "AUTH0_CLIENT_SECRET"
+
+// LogEndpoint is the endpoint for sending log data
+const LogEndpoint string = "PAPERTRAIL_ENDPOINT"

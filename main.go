@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"os"
 
+	"fmt"
+
 	"github.com/Gamebuildr/Dave/client"
 	"github.com/Gamebuildr/Dave/pkg/config"
 	"github.com/Gamebuildr/Dave/pkg/scaler"
@@ -16,14 +18,16 @@ func main() {
 	daveClient.Create()
 
 	gogetaScaler := createGogetaScaler()
+	mrrobotScaler := createMrRobotScaler()
 
 	c.AddFunc("0 * * * * *", func() {
 		daveClient.RunClient(gogetaScaler, os.Getenv(config.GogetaSQSEndpoint))
-		//daveClient.RunClient(mrrobotScaler, os.Getenv(config.MrrobotSQSEndpoint))
+		daveClient.RunClient(mrrobotScaler, os.Getenv(config.MrrobotSQSEndpoint))
 	})
 	c.Start()
 
 	daveClient.Log.Info("Dave client running on port 3001.")
+	fmt.Printf("Dave client running on port 3001")
 	err := http.ListenAndServe(":3001", nil)
 	if err != nil {
 		daveClient.Log.Error(err.Error())

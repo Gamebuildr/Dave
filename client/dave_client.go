@@ -1,16 +1,14 @@
 package client
 
 import (
-	"fmt"
 	"net/http"
 	"os"
-	"path"
-	"path/filepath"
 
 	"github.com/Gamebuildr/Dave/pkg/config"
 	"github.com/Gamebuildr/Dave/pkg/scaler"
 	"github.com/Gamebuildr/Dave/pkg/watcher"
 	"github.com/Gamebuildr/gamebuildr-lumberjack/pkg/logger"
+	"github.com/Gamebuildr/gamebuildr-lumberjack/pkg/papertrail"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
@@ -27,13 +25,10 @@ const logFileName string = "dave_client_"
 // Create a new DaveClient
 func (client *DaveClient) Create() {
 	// New logger
-	rootDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		fmt.Printf(err.Error())
-		return
+	fileLogger := papertrail.PapertrailLogSave{
+		App: "Dave",
+		URL: os.Getenv(config.LogEndpoint),
 	}
-	logDir := path.Join(rootDir, "client/logs", logFileName)
-	fileLogger := logger.FileLogSave{LogFileDir: logDir}
 	logs := logger.SystemLogger{LogSave: fileLogger}
 
 	// AWS SQS session
