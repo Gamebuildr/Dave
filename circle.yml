@@ -24,7 +24,7 @@ deployment:
   prod:
     branch: master
     commands:
-      - sudo -i ~/.ssh/id_circle-ci boomer@35.187.70.152 sudo service dave stop
+      - ssh -i ~/.ssh/id_circle-ci boomer@35.187.70.152 sudo service dave stop
       - sudo scp -i ~/.ssh/id_circle-ci Dave boomer@35.187.70.152:/var/www/go/bin
-      - sudo -i ~/.ssh/id_circle-ci boomer@35.187.70.152 sudo service dave start
+      - ssh -i ~/.ssh/id_circle-ci boomer@35.187.70.152 sudo service dave start
       
