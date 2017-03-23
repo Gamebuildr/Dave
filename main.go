@@ -35,8 +35,9 @@ func main() {
 }
 
 func createGogetaScaler() *scaler.ScalableSystem {
+	container := "?image=gcr.io/gamebuildr-151415/gamebuildr-gogeta"
 	loadAPI := os.Getenv(config.HalGogetaAPI) + "api/container/count"
-	addLoadAPI := os.Getenv(config.HalGogetaAPI) + "api/container/run"
+	addLoadAPI := os.Getenv(config.HalGogetaAPI) + "api/container/run/" + container
 
 	gogetaScaler := scaler.HTTPScaler{
 		LoadAPIUrl:    loadAPI,
@@ -51,8 +52,9 @@ func createGogetaScaler() *scaler.ScalableSystem {
 }
 
 func createMrRobotScaler() *scaler.ScalableSystem {
+	container := "?image=gcr.io/gamebuildr-151415/mr-robot-godot-2.1.2"
 	loadAPI := os.Getenv(config.HalMrRobotAPI) + "api/container/count"
-	addLoadAPI := os.Getenv(config.HalMrRobotAPI) + "api/container/run"
+	addLoadAPI := os.Getenv(config.HalMrRobotAPI) + "api/container/run/" + container
 
 	mrrobotScaler := scaler.HTTPScaler{
 		LoadAPIUrl:    loadAPI,
