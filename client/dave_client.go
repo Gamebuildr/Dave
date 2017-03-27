@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"os"
 
+	"fmt"
+
 	"github.com/Gamebuildr/Dave/pkg/config"
 	"github.com/Gamebuildr/Dave/pkg/scaler"
 	"github.com/Gamebuildr/Dave/pkg/watcher"
@@ -67,6 +69,7 @@ func (client *DaveClient) RunClient(system *scaler.ScalableSystem, queueURL stri
 		return
 	}
 	if resp.StatusCode != http.StatusOK {
-		client.Log.Error(resp.Status)
+		err := fmt.Errorf("Adding container load failed with response %v", resp.Status)
+		client.Log.Error(err.Error())
 	}
 }
