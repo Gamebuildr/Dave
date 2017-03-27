@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 
+	"fmt"
+
 	"github.com/Gamebuildr/Hal/pkg/config"
 	jwt "github.com/dgrijalva/jwt-go"
 )
@@ -43,7 +45,7 @@ func (system HTTPScaler) GetSystemLoad() (int, error) {
 	}
 	jsonResp := Response{}
 	if err := json.Unmarshal(resp, &jsonResp); err != nil {
-		return 0, err
+		return 0, fmt.Errorf("Container Load Response: %v, Error: %v", string(resp), err.Error())
 	}
 	return jsonResp.LoadCount, nil
 }
