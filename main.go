@@ -52,7 +52,7 @@ func createGogetaScaler() *scaler.ScalableSystem {
 }
 
 func createMrRobotScaler() *scaler.ScalableSystem {
-	container := "?image=gcr.io/gamebuildr-151415/mr-robot-godot-2.1.2"
+	container := "?image=gcr.io/gamebuildr-151415/mr-robot-godot"
 	loadAPI := os.Getenv(config.HalMrRobotAPI) + "api/container/count"
 	addLoadAPI := os.Getenv(config.HalMrRobotAPI) + "api/container/run" + container
 

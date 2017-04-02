@@ -65,6 +65,8 @@ func (client *DaveClient) RunClient(system *scaler.ScalableSystem, queueURL stri
 	}
 	resp, err := system.System.AddSystemLoad()
 	if err != nil {
+		respinfo := fmt.Sprintf("Hal Response: %v", resp)
+		client.Log.Info(respinfo)
 		client.Log.Error(err.Error())
 		return
 	}
