@@ -6,6 +6,8 @@ import (
 
 	"fmt"
 
+	"strconv"
+
 	"github.com/Gamebuildr/Dave/pkg/config"
 	"github.com/Gamebuildr/Dave/pkg/scaler"
 	"github.com/Gamebuildr/Dave/pkg/watcher"
@@ -20,18 +22,27 @@ import (
 type DaveClient struct {
 	Watcher watcher.QueueMonitor
 	Log     logger.Log
+	DevMode bool
 }
 
 const logFileName string = "dave_client_"
 
 // Create a new DaveClient
 func (client *DaveClient) Create() {
-	// New logger
-	fileLogger := papertrail.PapertrailLogSave{
-		App: "Dave",
-		URL: os.Getenv(config.LogEndpoint),
+	logs := logger.SystemLogger{}
+	if client.DevMode {
+		fileLogger := logger.FileLogSave{
+			LogFileName: logFileName,
+			LogFileDir:  os.Getenv(config.LogEndpoint),
+		}
+		logs.LogSave = fileLogger
+	} else {
+		papertrailLog := papertrail.PapertrailLogSave{
+			App: "Dave",
+			URL: os.Getenv(config.LogEndpoint),
+		}
+		logs.LogSave = papertrailLog
 	}
-	logs := logger.SystemLogger{LogSave: fileLogger}
 
 	// AWS SQS session
 	sess := session.Must(session.NewSession())
@@ -48,6 +59,7 @@ func (client *DaveClient) Create() {
 // start up systems if the load is less than the max load
 func (client *DaveClient) RunClient(system *scaler.ScalableSystem, queueURL string) {
 	messageCount, err := client.Watcher.Queue.ReadQueueMessagesCount(queueURL)
+	client.Log.Info(fmt.Sprintf("Message count: %v", strconv.Itoa(messageCount)))
 	if err != nil {
 		client.Log.Error(err.Error())
 	}

@@ -20,3 +20,6 @@ const Auth0ClientSecret string = "AUTH0_CLIENT_SECRET"
 
 // LogEndpoint is the endpoint for sending log data
 const LogEndpoint string = "PAPERTRAIL_ENDPOINT"
+
+// DevMode defines whether or not to run Mr.Robot in developer mode
+const DevMode string = "DEV_MODE"
