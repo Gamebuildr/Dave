@@ -3,22 +3,34 @@ package main
 import (
 	"net/http"
 	"os"
+	"strconv"
 
 	"fmt"
 
 	"github.com/Gamebuildr/Dave/client"
 	"github.com/Gamebuildr/Dave/pkg/config"
+	"github.com/Gamebuildr/Dave/pkg/gamebuildr_containers"
 	"github.com/Gamebuildr/Dave/pkg/scaler"
 	"github.com/robfig/cron"
 )
 
 func main() {
+	devMode, err := strconv.ParseBool(os.Getenv(config.DevMode))
+	if err != nil {
+		devMode = false
+	}
+
 	c := cron.New()
 	daveClient := client.DaveClient{}
+	daveClient.DevMode = devMode
 	daveClient.Create()
 
 	gogetaScaler := createGogetaScaler()
-	mrrobotScaler := createMrRobotScaler()
+	mrrobotScaler, err := createMrRobotScaler()
+	if err != nil {
+		daveClient.Log.Error(err.Error())
+		return
+	}
 
 	c.AddFunc("0 * * * * *", func() {
 		daveClient.RunClient(gogetaScaler, os.Getenv(config.GogetaSQSEndpoint))
@@ -28,7 +40,7 @@ func main() {
 
 	daveClient.Log.Info("Dave client running on port 3001.")
 	fmt.Printf("Dave client running on port 3001")
-	err := http.ListenAndServe(":3001", nil)
+	err = http.ListenAndServe(":3001", nil)
 	if err != nil {
 		daveClient.Log.Error(err.Error())
 	}
@@ -51,8 +63,14 @@ func createGogetaScaler() *scaler.ScalableSystem {
 	return &system
 }
 
-func createMrRobotScaler() *scaler.ScalableSystem {
-	container := "?image=gcr.io/gamebuildr-151415/mr.robot-godot-2.1.2"
+func createMrRobotScaler() (*scaler.ScalableSystem, error) {
+	containers := gamebuildrContainers.GamebuildrContainers{}
+	imageName, err := containers.GetContainerImageName("godot", "2.1.2")
+	if err != nil {
+		return nil, err
+	}
+
+	container := fmt.Sprintf("?image=gcr.io/gamebuildr-151415/%v", imageName)
 	loadAPI := os.Getenv(config.HalMrRobotAPI) + "api/container/count"
 	addLoadAPI := os.Getenv(config.HalMrRobotAPI) + "api/container/run" + container
 
@@ -65,5 +83,5 @@ func createMrRobotScaler() *scaler.ScalableSystem {
 		System:  mrrobotScaler,
 		MaxLoad: 3,
 	}
-	return &system
+	return &system, nil
 }
