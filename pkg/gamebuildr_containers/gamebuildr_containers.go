@@ -4,7 +4,7 @@ import "errors"
 import "strings"
 
 var godotVersions = map[string]string{
-	"2.1.2": "mr.robot-godot-2.1.2",
+	"2.1": "mr.robot-godot-2.1.2",
 }
 
 var defoldVersions = map[string]string{
@@ -12,8 +12,8 @@ var defoldVersions = map[string]string{
 }
 
 var containers = map[string]map[string]string{
-	"godot":  godotVersions,
-	"defold": defoldVersions,
+	"godot engine": godotVersions,
+	"defold":       defoldVersions,
 }
 
 // GamebuildrContainers is responsible for docker container image management

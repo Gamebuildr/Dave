@@ -9,8 +9,6 @@ import (
 
 	"github.com/Gamebuildr/Dave/client"
 	"github.com/Gamebuildr/Dave/pkg/config"
-	"github.com/Gamebuildr/Dave/pkg/gamebuildr_containers"
-	"github.com/Gamebuildr/Dave/pkg/scaler"
 	"github.com/robfig/cron"
 )
 
@@ -25,16 +23,9 @@ func main() {
 	daveClient.DevMode = devMode
 	daveClient.Create()
 
-	gogetaScaler := createGogetaScaler()
-	mrrobotScaler, err := createMrRobotScaler()
-	if err != nil {
-		daveClient.Log.Error(err.Error())
-		return
-	}
-
 	c.AddFunc("0 * * * * *", func() {
-		daveClient.RunClient(gogetaScaler, os.Getenv(config.GogetaSQSEndpoint))
-		daveClient.RunClient(mrrobotScaler, os.Getenv(config.MrrobotSQSEndpoint))
+		daveClient.RunClient(client.GogetaSubsystem, os.Getenv(config.GogetaSQSEndpoint), 10)
+		daveClient.RunClient(client.MrRobotSubsystem, os.Getenv(config.MrrobotSQSEndpoint), 3)
 	})
 	c.Start()
 
@@ -44,44 +35,4 @@ func main() {
 	if err != nil {
 		daveClient.Log.Error(err.Error())
 	}
-}
-
-func createGogetaScaler() *scaler.ScalableSystem {
-	container := "?image=gcr.io/gamebuildr-151415/gamebuildr-gogeta"
-	loadAPI := os.Getenv(config.HalGogetaAPI) + "api/container/count"
-	addLoadAPI := os.Getenv(config.HalGogetaAPI) + "api/container/run" + container
-
-	gogetaScaler := scaler.HTTPScaler{
-		LoadAPIUrl:    loadAPI,
-		AddLoadAPIUrl: addLoadAPI,
-		Client:        &http.Client{},
-	}
-	system := scaler.ScalableSystem{
-		System:  gogetaScaler,
-		MaxLoad: 10,
-	}
-	return &system
-}
-
-func createMrRobotScaler() (*scaler.ScalableSystem, error) {
-	containers := gamebuildrContainers.GamebuildrContainers{}
-	imageName, err := containers.GetContainerImageName("godot", "2.1.2")
-	if err != nil {
-		return nil, err
-	}
-
-	container := fmt.Sprintf("?image=gcr.io/gamebuildr-151415/%v", imageName)
-	loadAPI := os.Getenv(config.HalMrRobotAPI) + "api/container/count"
-	addLoadAPI := os.Getenv(config.HalMrRobotAPI) + "api/container/run" + container
-
-	mrrobotScaler := scaler.HTTPScaler{
-		LoadAPIUrl:    loadAPI,
-		AddLoadAPIUrl: addLoadAPI,
-		Client:        &http.Client{},
-	}
-	system := scaler.ScalableSystem{
-		System:  mrrobotScaler,
-		MaxLoad: 3,
-	}
-	return &system, nil
 }
