@@ -8,6 +8,8 @@ import (
 
 	"fmt"
 
+	"bytes"
+
 	"github.com/Gamebuildr/Hal/pkg/config"
 	jwt "github.com/dgrijalva/jwt-go"
 )
@@ -51,8 +53,9 @@ func (system HTTPScaler) GetSystemLoad() (int, error) {
 }
 
 // AddSystemLoad will increase the systems load by one
-func (system HTTPScaler) AddSystemLoad() (*http.Response, error) {
-	r, err := http.NewRequest(http.MethodPost, system.AddLoadAPIUrl, nil)
+func (system HTTPScaler) AddSystemLoad(message string) (*http.Response, error) {
+	r, err := http.NewRequest(http.MethodPost, system.AddLoadAPIUrl, bytes.NewBuffer([]byte(message)))
+	r.Header.Set("Content-Type", "application/json")
 	if err != nil {
 		return nil, err
 	}
