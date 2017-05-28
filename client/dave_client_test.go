@@ -11,8 +11,11 @@ type MockWatcher struct {
 	messagecount int
 }
 
-func (watcher MockWatcher) ReadQueueMessagesCount(url string) (int, error) {
+func (watcher MockWatcher) ReadNextMessage(url string) (int, error) {
 	return watcher.messagecount, nil
+}
+
+func (watcher MockWatcher) Setup() {
 }
 
 type MockScaler struct {

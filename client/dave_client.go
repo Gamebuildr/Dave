@@ -6,16 +6,11 @@ import (
 
 	"fmt"
 
-	"strconv"
-
 	"github.com/Gamebuildr/Dave/pkg/config"
 	"github.com/Gamebuildr/Dave/pkg/scaler"
 	"github.com/Gamebuildr/Dave/pkg/watcher"
 	"github.com/Gamebuildr/gamebuildr-lumberjack/pkg/logger"
 	"github.com/Gamebuildr/gamebuildr-lumberjack/pkg/papertrail"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
 // DaveClient scales microservices remotely
@@ -44,12 +39,10 @@ func (client *DaveClient) Create() {
 		logs.LogSave = papertrailLog
 	}
 
-	// AWS SQS session
-	sess := session.Must(session.NewSession())
-	sess.Config.Region = aws.String(os.Getenv(config.Region))
-
 	// setup client
-	client.Watcher.Queue = watcher.AmazonWatcher{Client: sqs.New(sess)}
+	clientWatcher := watcher.QueueWatcher{}
+	clientWatcher.Setup()
+	client.Watcher.Queue = clientWatcher
 	client.Log = logs
 
 	client.Log.Info("Dave Setup and Running")
@@ -58,8 +51,7 @@ func (client *DaveClient) Create() {
 // RunClient will read queue messages and send a response to an api endpoint to
 // start up systems if the load is less than the max load
 func (client *DaveClient) RunClient(system *scaler.ScalableSystem, queueURL string) {
-	messageCount, err := client.Watcher.Queue.ReadQueueMessagesCount(queueURL)
-	client.Log.Info(fmt.Sprintf("Message count: %v", strconv.Itoa(messageCount)))
+	messageCount, err := client.Watcher.Queue.ReadNextMessage(queueURL)
 	if err != nil {
 		client.Log.Error(err.Error())
 	}
