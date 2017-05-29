@@ -28,7 +28,7 @@ type Response struct {
 
 // GetSystemLoad returns to load count of the running system
 func (system HTTPScaler) GetSystemLoad() (int, error) {
-	r, err := http.NewRequest(http.MethodPost, system.LoadAPIUrl, nil)
+	r, err := http.NewRequest(http.MethodGet, system.LoadAPIUrl, nil)
 	if err != nil {
 		return 0, err
 	}
