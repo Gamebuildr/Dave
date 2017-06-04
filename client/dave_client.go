@@ -23,9 +23,10 @@ const MrRobotSubsystem = "MRROBOT"
 
 // DaveClient scales microservices remotely
 type DaveClient struct {
-	Watcher watcher.QueueMonitor
-	Log     logger.Log
-	DevMode bool
+	Watcher      watcher.QueueMonitor
+	Log          logger.Log
+	DevMode      bool
+	ClientScaler scaler.System
 }
 
 type basicEngineMessage struct {
@@ -57,6 +58,9 @@ func (client *DaveClient) Create() {
 	clientWatcher.Setup()
 	client.Watcher.Queue = clientWatcher
 	client.Log = logs
+	client.ClientScaler = &scaler.HTTPScaler{
+		Client: &http.Client{},
+	}
 
 	client.Log.Info("Dave Setup and Running")
 }
@@ -84,12 +88,12 @@ func (client *DaveClient) RunClient(subSystem string, queueURL string, maxLoad i
 		return
 	}
 
-	clientScaler, err := client.getScaler(subSystem, engineData.EngineName, engineData.EngineVersion)
+	err = client.setScalerURLs(subSystem, engineData.EngineName, engineData.EngineVersion)
 	if err != nil {
 		client.Log.Error(err.Error())
 		return
 	}
-	load, err := clientScaler.GetSystemLoad()
+	load, err := client.ClientScaler.GetSystemLoad()
 	if err != nil {
 		client.Log.Error(err.Error())
 		return
@@ -101,7 +105,7 @@ func (client *DaveClient) RunClient(subSystem string, queueURL string, maxLoad i
 	}
 
 	client.Log.Info(fmt.Sprintf("[%v] Adding to system load", message.MessageID))
-	resp, err := clientScaler.AddSystemLoad(message.Message)
+	resp, err := client.ClientScaler.AddSystemLoad(message.Message)
 	if err != nil {
 		respinfo := fmt.Sprintf("Hal Response: %v", resp)
 		client.Log.Info(respinfo)
@@ -114,7 +118,7 @@ func (client *DaveClient) RunClient(subSystem string, queueURL string, maxLoad i
 	}
 }
 
-func (client *DaveClient) getScaler(subSystem string, engineName string, engineVersion string) (scaler.System, error) {
+func (client *DaveClient) setScalerURLs(subSystem string, engineName string, engineVersion string) error {
 	var container string
 	var halBaseURL string
 	if subSystem == GogetaSubsystem {
@@ -124,19 +128,15 @@ func (client *DaveClient) getScaler(subSystem string, engineName string, engineV
 		containers := gamebuildrContainers.GamebuildrContainers{}
 		imageName, err := containers.GetContainerImageName(engineName, engineVersion)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		container = fmt.Sprintf("?image=gcr.io/gamebuildr-151415/%v", imageName)
 		halBaseURL = os.Getenv(config.HalMrRobotAPI)
 	} else {
-		return nil, fmt.Errorf("Invalid system requested %v %v %v", subSystem, engineName, engineVersion)
+		return fmt.Errorf("Invalid system requested %v %v %v", subSystem, engineName, engineVersion)
 	}
 
-	clientScaler := scaler.HTTPScaler{
-		Client:        &http.Client{},
-		LoadAPIUrl:    halBaseURL + "api/container/count",
-		AddLoadAPIUrl: halBaseURL + "api/container/run" + container,
-	}
+	client.ClientScaler.SetLoadURLs(halBaseURL+"api/container/count", halBaseURL+"api/container/run"+container)
 
-	return clientScaler, nil
+	return nil
 }

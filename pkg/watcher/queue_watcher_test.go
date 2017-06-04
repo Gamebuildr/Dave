@@ -28,11 +28,11 @@ func TestGetQueueMessages(t *testing.T) {
 			Resp: sqs.ReceiveMessageOutput{
 				Messages: []*sqs.Message{
 					{
-						Body:          aws.String(`{"message":"one"}`),
+						Body:          aws.String(`{"MessageId": "f6720a18-fb39-56e2-8504-5bbf2f75c021", "message":"one"}`),
 						ReceiptHandle: &messageReceipt,
 					},
 					{
-						Body:          aws.String(`{"message":"one"}`),
+						Body:          aws.String(`{"MessageId": "f6720a18-fb39-56e2-8504-5bbf2f75c022", message":"one"}`),
 						ReceiptHandle: &messageReceipt,
 					},
 				},
@@ -40,13 +40,16 @@ func TestGetQueueMessages(t *testing.T) {
 		},
 	}
 	for i, c := range mockMessages {
-		queue := QueueWatcher{Client: MockedAmazonClient{Response: c.Resp}}
-		count, err := queue.ReadNextMessage(fmt.Sprintf("mockUrl_%d", i))
+		queue := QueueWatcher{client: MockedAmazonClient{Response: c.Resp}}
+		messageInfo, err := queue.ReadNextMessage(fmt.Sprintf("mockUrl_%d", i))
 		if err != nil {
 			t.Fatalf("%d, amazon test error, %v", i, err)
 		}
-		if count != 2 {
-			t.Errorf("Expected a count of %v, got %v", 2, count)
+		if messageInfo.MessageID != "f6720a18-fb39-56e2-8504-5bbf2f75c021" {
+			t.Errorf("Expected ID %v, got %v", "f6720a18-fb39-56e2-8504-5bbf2f75c021", messageInfo.MessageID)
+		}
+		if messageInfo.Message != "one" {
+			t.Errorf("Expected message %v, got %v", "one", messageInfo.Message)
 		}
 	}
 }

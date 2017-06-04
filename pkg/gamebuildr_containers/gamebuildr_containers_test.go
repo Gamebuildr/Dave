@@ -4,7 +4,7 @@ import "testing"
 
 func TestGetContainerImageNameGodot212(t *testing.T) {
 	gamebuildrContainers := GamebuildrContainers{}
-	image, err := gamebuildrContainers.GetContainerImageName("godot", "2.1.2")
+	image, err := gamebuildrContainers.GetContainerImageName("godot engine", "2.1")
 
 	if err != nil {
 		t.Fatalf(err.Error())
@@ -32,7 +32,7 @@ func TestGetContainerImageNameDefold1(t *testing.T) {
 
 func TestGetContainerImageNameNotExistantVersion(t *testing.T) {
 	gamebuildrContainers := GamebuildrContainers{}
-	_, err := gamebuildrContainers.GetContainerImageName("godot", "test")
+	_, err := gamebuildrContainers.GetContainerImageName("godot engine", "test")
 
 	if err == nil {
 		t.Errorf("Expected error, got nil")

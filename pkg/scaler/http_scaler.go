@@ -69,6 +69,12 @@ func (system HTTPScaler) AddSystemLoad(message string) (*http.Response, error) {
 	return w, nil
 }
 
+// SetLoadURLs sets the load urls for the system
+func (system *HTTPScaler) SetLoadURLs(loadAPIUrl string, addLoadAPIUrl string) {
+	system.LoadAPIUrl = loadAPIUrl
+	system.AddLoadAPIUrl = addLoadAPIUrl
+}
+
 func authenticateRoute(r *http.Request) error {
 	token, err := getStringToken()
 	if err != nil {

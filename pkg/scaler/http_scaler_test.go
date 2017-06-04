@@ -44,7 +44,7 @@ func TestHTTPScalerHitScalingRequestEndpoint(t *testing.T) {
 		Client:        &http.Client{},
 	}
 
-	resp, err := httpScaler.AddSystemLoad()
+	resp, err := httpScaler.AddSystemLoad("")
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
