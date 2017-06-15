@@ -2,6 +2,7 @@ package watcher
 
 // Queue is the interface to specify a queue service
 type Queue interface {
+	Setup()
 	ReadNextMessage(url string) (*MessageInfo, error)
 	DeleteMessage(messageID string, url string) error
 }

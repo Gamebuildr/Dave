@@ -31,8 +31,7 @@ func main() {
 
 	daveClient.Log.Info("Dave client running on port 3001.")
 	fmt.Printf("Dave client running on port 3001")
-	err = http.ListenAndServe(":3001", nil)
-	if err != nil {
+	if err := http.ListenAndServe(":3001", nil); err != nil {
 		daveClient.Log.Error(err.Error())
 	}
 }
