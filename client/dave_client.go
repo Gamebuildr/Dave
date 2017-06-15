@@ -56,7 +56,7 @@ func (client *DaveClient) Create() {
 	// setup client
 	clientWatcher := watcher.QueueWatcher{}
 	clientWatcher.Setup()
-	client.Watcher.Queue = clientWatcher
+	client.Watcher.Queue = &clientWatcher
 	client.Log = logs
 	client.ClientScaler = &scaler.HTTPScaler{
 		Client: &http.Client{},
