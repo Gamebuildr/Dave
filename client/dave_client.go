@@ -74,7 +74,6 @@ func (client *DaveClient) RunClient(subSystem string, queueURL string, maxLoad i
 		return
 	}
 	if message.MessageID == "" {
-		client.Log.Info(fmt.Sprintf("Found no messages for %v", subSystem))
 		return
 	}
 	client.Log.Info(fmt.Sprintf("[%v] Found message for %v, %v", message.MessageID, subSystem, message.Message))
