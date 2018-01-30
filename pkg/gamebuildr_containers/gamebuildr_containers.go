@@ -11,9 +11,14 @@ var defoldVersions = map[string]string{
 	"1": "mr.robot-defold-1",
 }
 
+var unrealVersions = map[string]string{
+	"4.17": "unreal-4.17.2",
+}
+
 var containers = map[string]map[string]string{
 	"godot engine": godotVersions,
 	"defold":       defoldVersions,
+	"unreal":       unrealVersions,
 }
 
 // GamebuildrContainers is responsible for docker container image management

@@ -30,6 +30,20 @@ func TestGetContainerImageNameDefold1(t *testing.T) {
 	}
 }
 
+func TestGetContainerImageNameUnreal417(t *testing.T) {
+	gamebuildrContainers := GamebuildrContainers{}
+	image, err := gamebuildrContainers.GetContainerImageName("unreal", "4.17")
+
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
+	expectedImageName := "unreal-4.17.2"
+	if image != expectedImageName {
+		t.Errorf("Expected image to be %v but got %v", expectedImageName, image)
+	}
+}
+
 func TestGetContainerImageNameNotExistantVersion(t *testing.T) {
 	gamebuildrContainers := GamebuildrContainers{}
 	_, err := gamebuildrContainers.GetContainerImageName("godot engine", "test")
